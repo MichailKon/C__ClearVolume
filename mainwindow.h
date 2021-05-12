@@ -9,7 +9,10 @@
 #include <QFileDialog>
 #include <boost/filesystem.hpp>
 #include <QMap>
-
+#include <QThread>
+#include <QMutex>
+#include "filesizecounter.h"
+#include "loadingscreen.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class mainWindow; }
@@ -31,10 +34,20 @@ private slots:
 
     void showFiles();
 
+    void offThread();
+
+    void lockUi();
+
+    void unlockUi();
+
 private:
     Ui::mainWindow *ui;
+    LoadingScreen *loadingScreen;
+
     boost::filesystem::path curPath;
-    QVector<QPair<QString, std::uintmax_t>> curFiles;
+
+    QVector<QPair<boost::filesystem::path, std::uintmax_t>> curFiles;
+    QThread *countingThread;
 };
 
 
