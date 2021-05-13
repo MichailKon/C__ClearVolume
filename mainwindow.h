@@ -44,10 +44,12 @@ private:
     Ui::mainWindow *ui;
     LoadingScreen *loadingScreen;
 
-    boost::filesystem::path curPath;
+    QDir curPath;
+    QDir calculatedPath;
 
-    QVector<QPair<boost::filesystem::path, std::uintmax_t>> curFiles;
+    QVector<QPair<QDir, qint64>> curFiles;
     QThread *countingThread;
+    FileSizeCounter *counter{};
 };
 
 

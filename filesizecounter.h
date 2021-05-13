@@ -8,29 +8,32 @@
 #include <QObject>
 #include <boost/filesystem.hpp>
 #include <QMutex>
+#include <QDir>
+#include <QFileInfo>
+#include <QDirIterator>
 #include "functions.h"
 
 class FileSizeCounter : public QObject {
 Q_OBJECT
 private:
-    boost::filesystem::path start;
-    QVector<QPair<boost::filesystem::path, std::uintmax_t>> &out;
+    QDir start;
+    QVector<QPair<QDir, qint64>> &out;
     int maxDeep;
 
 public:
-    explicit FileSizeCounter(QVector<QPair<boost::filesystem::path, std::uintmax_t>> &);
+    explicit FileSizeCounter(QVector<QPair<QDir, qint64>> &);
 
     ~FileSizeCounter() override;
 
-    void setStart(const boost::filesystem::path &);
+    void setStart(const QDir &);
 
     void setMaxDeep(const int &);
 
 public slots:
 
-    std::uintmax_t doWork1();
+    qint64 doWork1();
 
-    std::uintmax_t doWork(const boost::filesystem::path &, int = 0);
+    qint64 doWork(const QDir&, int = 0);
 
 signals:
 

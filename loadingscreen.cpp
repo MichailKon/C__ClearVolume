@@ -13,7 +13,6 @@ LoadingScreen::LoadingScreen(QWidget *parent) :
     ui->setupUi(this);
     ui->label->setAlignment(Qt::AlignCenter);
     setLayout(ui->gridLayout);
-    qDebug() << movie.isValid() << '\n';
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &LoadingScreen::endAnimation);
 
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
@@ -25,14 +24,12 @@ LoadingScreen::~LoadingScreen() {
 }
 
 void LoadingScreen::startAnimation() {
-    qDebug() << QString::fromStdString("Started\n");
     movie.start();
     show();
 }
 
 void LoadingScreen::endAnimation() {
-    qDebug() << QString::fromStdString("Stopped\n");
     movie.stop();
-    hide();
+    close();
     emit closed();
 }

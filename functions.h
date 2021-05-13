@@ -16,7 +16,7 @@
 #include <QThread>
 
 namespace funcs {
-    QString toHumanReadable(std::uintmax_t);
+    QString toHumanReadable(qint64);
 }
 
 #endif //C__CLEARVOLUME_FUNCTIONS_H
