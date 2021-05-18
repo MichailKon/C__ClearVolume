@@ -1,0 +1,4 @@
+/home/michael/Files/C++ClearVolume/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/michael/Files/C++ClearVolume/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/michael/Files/C++ClearVolume/cmake-build-debug/CMakeFiles/C__ClearVolume.dir
+/home/michael/Files/C++ClearVolume/cmake-build-debug/CMakeFiles/C__ClearVolume_autogen.dir
