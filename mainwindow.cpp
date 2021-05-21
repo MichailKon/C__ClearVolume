@@ -12,10 +12,9 @@
 mainWindow::mainWindow(QWidget *parent) :
         QWidget(parent), ui(new Ui::mainWindow), curPath(), calculatedPath(), curFiles(), counter(nullptr) {
     ui->setupUi(this);
-    setLayout(ui->gridLayout);
+    ui->progressBar->setValue(0);
     countingThread = new QThread();
-    loadingScreen = new LoadingScreen(this);
-    loadingScreen->hide();
+    ui->pushButton_cancel->hide();
 
     connect(ui->pushButton_chooseFolder, &QPushButton::pressed, this, &mainWindow::chooseFolder);
     connect(ui->pushButton_calculate, &QPushButton::pressed, this, &mainWindow::compute);
@@ -27,7 +26,7 @@ mainWindow::mainWindow(QWidget *parent) :
 
 mainWindow::~mainWindow() {
     delete ui;
-    delete loadingScreen;
+    offThread();
     delete countingThread;
 }
 
@@ -45,16 +44,22 @@ void mainWindow::compute() {
     offThread();
 
     int maxDeep = (ui->spinBox_recursionLimit->value() == 0 ? INT_MAX : ui->spinBox_recursionLimit->value());
+    calculatedPath = curPath;
 
+    ui->pushButton_cancel->show();
     delete counter;
     counter = new FileSizeCounter(curFiles);
-    connect(countingThread, &QThread::started, loadingScreen, &LoadingScreen::startAnimation);
+
+    connect(counter, &FileSizeCounter::moreFiles, ui->progressBar, &QProgressBar::setValue);
+    connect(counter, &FileSizeCounter::newInfo, ui->label_info, &QLabel::setText);
+
     connect(countingThread, &QThread::started, counter, &FileSizeCounter::doWork1);
-    connect(loadingScreen, &LoadingScreen::closed, this, &mainWindow::unlockUi);
+
+    connect(ui->pushButton_cancel, &QPushButton::clicked, this, &mainWindow::unlockUi);
     connect(counter, &FileSizeCounter::finished, countingThread, &QThread::quit);
     connect(counter, &FileSizeCounter::finished, this, &mainWindow::showFiles);
     connect(counter, &FileSizeCounter::finished, this, &mainWindow::unlockUi);
-    connect(counter, &FileSizeCounter::finished, loadingScreen, &LoadingScreen::endAnimation);
+
     counter->setStart(curPath);
     counter->setMaxDeep(maxDeep);
     counter->moveToThread(countingThread);
@@ -67,7 +72,9 @@ void mainWindow::compute() {
 }
 
 void mainWindow::showFiles() {
+    ui->pushButton_cancel->hide();
     lockUi();
+    ui->tableWidget->hide();
 
     std::sort(curFiles.begin(), curFiles.end(),
               [](const QPair<QDir, qint64> &l,
@@ -75,14 +82,7 @@ void mainWindow::showFiles() {
                   return l.second > r.second;
               });
 
-    for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
-        for (int j = 0; j < ui->tableWidget->columnCount(); i++) {
-            delete ui->tableWidget->item(i, j);
-        }
-    }
-
     ui->tableWidget->setRowCount(0);
-    ui->tableWidget->hide();
 
     for (const QPair<QDir, qint64> &path : curFiles) {
         int nowRow = ui->tableWidget->rowCount();
@@ -90,7 +90,7 @@ void mainWindow::showFiles() {
 
         QString nowPath = path.first.path();
         if (ui->checkBox_hidePrefix->isChecked()) {
-            nowPath.remove(0, calculatedPath.absolutePath().size());
+            nowPath = calculatedPath.relativeFilePath(path.first.path());
         }
         auto *filePath = new QTableWidgetItem(nowPath);
         filePath->setFlags(filePath->flags() ^ Qt::ItemIsEditable);
@@ -118,9 +118,13 @@ void mainWindow::unlockUi() {
 
     ui->pushButton_chooseFolder->setEnabled(true);
     ui->pushButton_calculate->setEnabled(true);
+    ui->checkBox_hidePrefix->setEnabled(true);
+    ui->spinBox_recursionLimit->setEnabled(true);
 }
 
 void mainWindow::lockUi() {
     ui->pushButton_chooseFolder->setEnabled(false);
     ui->pushButton_calculate->setEnabled(false);
+    ui->checkBox_hidePrefix->setEnabled(false);
+    ui->spinBox_recursionLimit->setEnabled(false);
 }

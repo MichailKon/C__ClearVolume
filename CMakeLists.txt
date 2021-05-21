@@ -15,7 +15,7 @@ include_directories(images)
 include_directories(uis)
 
 configure_file(images/loading.gif images/loading.gif COPYONLY)
-add_executable(${PROJECT_NAME} main.cpp mainwindow.cpp mainwindow.h uis/mainWindow.ui functions.cpp functions.h filesizecounter.cpp filesizecounter.h loadingscreen.cpp loadingscreen.h uis/loadingscreen.ui)
+add_executable(${PROJECT_NAME} main.cpp mainwindow.cpp mainwindow.h uis/mainWindow.ui functions.cpp functions.h filesizecounter.cpp filesizecounter.h)
 
 if (NOT CMAKE_PREFIX_PATH)
     message(WARNING "CMAKE_PREFIX_PATH is not defined, you may need to set it "

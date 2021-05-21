@@ -12,7 +12,6 @@
 #include <QThread>
 #include <QMutex>
 #include "filesizecounter.h"
-#include "loadingscreen.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class mainWindow; }
@@ -42,7 +41,6 @@ private slots:
 
 private:
     Ui::mainWindow *ui;
-    LoadingScreen *loadingScreen;
 
     QDir curPath;
     QDir calculatedPath;

@@ -19,6 +19,12 @@ private:
     QDir start;
     QVector<QPair<QDir, qint64>> &out;
     int maxDeep;
+    int cnt = 0;
+    int allCnt = 0;
+
+    qint64 doWork(const QDir &, int = 0);
+
+    int getCntFiles(const QDir &);
 
 public:
     explicit FileSizeCounter(QVector<QPair<QDir, qint64>> &);
@@ -31,13 +37,15 @@ public:
 
 public slots:
 
-    qint64 doWork1();
-
-    qint64 doWork(const QDir&, int = 0);
+    void doWork1();
 
 signals:
 
     void finished();
+
+    void moreFiles(const int &cntFiles);
+
+    void newInfo(const QString &info);
 };
 
 
